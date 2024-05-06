@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+import java.util.ArrayList;
 
 // Lombok
 @RequiredArgsConstructor
@@ -50,12 +50,12 @@ public class RoleServicesImpl implements IRoleService<RoleDto, RoleEntity> {
     @Override
     public RoleDto entityToDto(RoleEntity roleEntity) {
         return modelMapperBeanClass.modelMapperMethod().map(roleEntity, RoleDto.class);
-    }
+    }//end entityToDto
 
     @Override
     public RoleEntity dtoToEntity(RoleDto roleDto) {
         return modelMapperBeanClass.modelMapperMethod().map(roleDto, RoleEntity.class);
-    }
+    }//end dtoToEntity
 
     ///////////////////////////////////////////////////////////////////////////////////////
     //**** CRUD*****************************************************************//
@@ -71,15 +71,28 @@ public class RoleServicesImpl implements IRoleService<RoleDto, RoleEntity> {
         roleDto.setRoleId(roleEntity2.getRoleId());
         roleDto.setSystemCreateDate(roleEntity2.getSystemCreateDate());
         return roleDto;
-    }
+    }//end roleServiceCreate
 
     @Override
     public List<RoleDto> roleServiceList(RoleDto roleDto) {
-        return List.of();
-    }
+        //Entity List
+        List<RoleEntity> roleEntityList1=iRoleRepository.findAll();
+
+        // Dto List
+        List<RoleDto> roleDtoList=new ArrayList<>();
+
+        // Entity To Dto List
+        for(RoleEntity tempEntity:roleEntityList1){
+            RoleDto roleDto1=entityToDto(tempEntity);
+            roleDtoList.add(roleDto1);
+        }
+        return roleDtoList;
+    }//end roleServiceList
 
     @Override
     public RoleDto roleServiceFindById(Long id) {
+        RoleEntity roleEntity1 =iRoleRepository.findById(id).orElse(null);
+
         return null;
     }
 
