@@ -5,10 +5,13 @@ import com.techcareer.business.dto.RoleDto;
 import com.techcareer.business.services.IRoleService;
 import com.techcareer.data.entity.RoleEntity;
 import com.techcareer.data.repository.IRoleRepository;
+import com.techcareer.exception.TechcareerException;
+import com.techcareer.exception.Resource404NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -22,27 +25,11 @@ import java.util.ArrayList;
 @Component("roleServicesImpl") // @Component => Spring'in bir parcasısın
 public class RoleServicesImpl implements IRoleService<RoleDto, RoleEntity> {
 
-    // Injection IRoleRepository (1.YOL => @Autowired)
-    /*
-    @Autowired
-    private IRoleRepository iRoleRepository;
-    */
-
-
-    // Injection IRoleRepository (2.YOL => Constructor Injection)
-    /*
-    private final IRoleRepository iRoleRepository;
-    @Autowired
-    public RoleServicesImpl(IRoleRepository iRoleRepository) {
-        this.iRoleRepository = iRoleRepository;
-    }
-    */
 
     // 3. YOL (Lombok => Constructor Injection)
     private final IRoleRepository iRoleRepository;
 
     // 1.YOL (ModelMapper)
-    // private final ModelMapper modelMapper;
     private final ModelMapperBeanClass modelMapperBeanClass;
 
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +46,10 @@ public class RoleServicesImpl implements IRoleService<RoleDto, RoleEntity> {
 
     ///////////////////////////////////////////////////////////////////////////////////////
     //**** CRUD*****************************************************************//
+
+    // CREATE (ROLE)
     @Override
+    @Transactional// Create,Update,Delete
     public RoleDto roleServiceCreate(RoleDto roleDto) {
         RoleEntity roleEntity1;
         // Dto => Entity çevirmek
@@ -73,8 +63,9 @@ public class RoleServicesImpl implements IRoleService<RoleDto, RoleEntity> {
         return roleDto;
     }//end roleServiceCreate
 
+    // LIST (ROLE)
     @Override
-    public List<RoleDto> roleServiceList(RoleDto roleDto) {
+    public List<RoleDto> roleServiceList() {
         //Entity List
         List<RoleEntity> roleEntityList1=iRoleRepository.findAll();
 
@@ -89,20 +80,65 @@ public class RoleServicesImpl implements IRoleService<RoleDto, RoleEntity> {
         return roleDtoList;
     }//end roleServiceList
 
+    // FIND (ROLE)
     @Override
     public RoleDto roleServiceFindById(Long id) {
-        RoleEntity roleEntity1 =iRoleRepository.findById(id).orElse(null);
+        // 1.YOL
+        /*
+        Optional<RoleEntity> optionalRoleEntityFindById= iRoleRepository.findById(id);
+        // isPresent: Entity varsa
+        if(optionalRoleEntityFindById.isPresent()){
+            return entityToDto(optionalRoleEntityFindById.get());
+        }
+        */
 
-        return null;
-    }
+        // 2.YOL
+        Boolean booleanRoleEntityFindById = iRoleRepository.findById(id).isPresent();
+        RoleEntity roleEntity = null;
+        //if(id!=null){
+        if (booleanRoleEntityFindById) {
+            roleEntity = iRoleRepository.findById(id).orElseThrow(
+                    () -> new Resource404NotFoundException(id + " nolu ID Bulunamadı")
+            );
+        } else if (!booleanRoleEntityFindById) {
+            throw new TechcareerException("Roles Dto id boş değer geldi");
+        }
+        return entityToDto(roleEntity);
+    }//end roleServiceFindById
 
+    // UPDATE (ROLE)
     @Override
+    @Transactional// Create,Update,Delete
     public RoleDto roleServiceUpdateById(Long id, RoleDto roleDto) {
-        return null;
-    }
+        // Find
+        RoleDto roleDtoFind = roleServiceFindById(id);
 
+        // Update
+        RoleEntity roleUpdateEntity = dtoToEntity(roleDtoFind);
+        if (roleUpdateEntity != null) {
+            roleUpdateEntity.setRoleName(roleDto.getRoleName());
+            iRoleRepository.save(roleUpdateEntity);
+        }
+        // ID ve Date Dto üzerinde Set yapıyorum
+        roleDto.setRoleId(roleUpdateEntity.getRoleId());
+        roleDto.setSystemCreateDate(roleUpdateEntity.getSystemCreateDate());
+        return entityToDto(roleUpdateEntity);
+    }//end roleServiceUpdateById
+
+    // DELETE (ROLE)
     @Override
+    @Transactional// Create,Update,Delete
     public RoleDto roleServiceDeleteById(Long id) {
-        return null;
-    }
+        // Find
+        RoleDto roleDtoFind = roleServiceFindById(id);
+
+        RoleEntity roleDeleteEntity = dtoToEntity(roleDtoFind);
+        if (roleDeleteEntity != null) {
+            iRoleRepository.deleteById(id);
+            return roleDtoFind;
+        }else {
+            throw new TechcareerException(roleDtoFind+ "nolu data silinemedi");
+        }
+        // return null;
+    }//end roleServiceDeleteById
 }// end RoleServicesImpl
