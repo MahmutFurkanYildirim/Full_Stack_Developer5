@@ -1,9 +1,9 @@
 package com.techcareer.business.dto;
 
+import com.techcareer.role.ERole;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
-
 import java.io.Serializable;
 import java.util.Date;
 
@@ -24,7 +24,9 @@ public class RoleDto implements Serializable {
 
     // Validation
     @NotEmpty(message = "{role.name.validation.constraints.NotNull.message}")
-    private String roleName;
+    @Builder.Default
+    //Annotation kullanmalisin cunku database ayni role adinda olmamasi gerekiyor
+    private String roleName = ERole.USER.toString();
 
     private Date systemCreateDate;
 } //end class RoleDto
