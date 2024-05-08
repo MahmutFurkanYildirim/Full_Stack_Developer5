@@ -27,8 +27,8 @@ public class UniqueRoleNameValidation implements ConstraintValidator<UniqueRoleN
 
         // 2.YOL
         Boolean isRolesFind=iRoleRepository.findByRoleName(rolName).isPresent();
-        // eğer böyle bir rolName varsa return false döndersin
-        if(isRolesFind)
+        // eğer böyle bir rolName yoksa return false döndersin
+        if(!isRolesFind)
             return false;
         return true;
     } // end isValid

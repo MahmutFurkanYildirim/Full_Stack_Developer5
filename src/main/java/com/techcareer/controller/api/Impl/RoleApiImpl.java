@@ -18,7 +18,7 @@ import java.util.List;
 @Log4j2
 
 // API (REST)
-//@RestController problem bu satirda!!!!
+@RestController //problem bu satirda!!!!
 @RequestMapping("/role/api/v1.0.0")
 @CrossOrigin //CORS: Hatası
 //@CrossOrigin(origins = ProjectUrl.REACT_FRONTEND_PORT_URL)
@@ -60,8 +60,8 @@ public class RoleApiImpl implements IRoleApi<RoleDto> {
             return ResponseEntity.status(400).body(apiResultCreate);
         }
         log.info("Role Api eklendi");
-        return ResponseEntity.status(201).body(iRoleService.roleServiceCreate(roleDtoData));
-    }
+        return ResponseEntity.status(201).body(roleCreateApi);
+    }//end roleServiceCreate
 
     // LIST Role(Api)
     // http://localhost:4444/role/api/v1.0.0/list
@@ -70,7 +70,7 @@ public class RoleApiImpl implements IRoleApi<RoleDto> {
     public ResponseEntity<List<RoleDto>> roleServiceList() {
         log.info("Role Api Listelendi");
         return ResponseEntity.ok(iRoleService.roleServiceList());
-    }
+    }//end roleServiceList
 
     //FIND Role(Api)
     // http://localhost:4444/role/api/v1.0.0/find
@@ -92,8 +92,8 @@ public class RoleApiImpl implements IRoleApi<RoleDto> {
             return ResponseEntity.status(404).body(apiResultFind);
         }
         log.info("Role Api bulundu");
-        return ResponseEntity.ok(iRoleService.roleServiceFindById(id));
-    }
+        return ResponseEntity.ok(roleFindApi);
+    }//end roleServiceFindById
 
 
     // UPDATE Role(Api)
@@ -116,8 +116,8 @@ public class RoleApiImpl implements IRoleApi<RoleDto> {
             return ResponseEntity.status(404).body(apiResultFind);
         }
         log.info("Role Api Güncellendi");
-        return ResponseEntity.ok(iRoleService.roleServiceUpdateById(id,roleDto));
-    }
+        return ResponseEntity.ok(roleUpdateApi);
+    }//end roleServiceUpdateById
 
     // DELETE Role(Api)
     // http://localhost:4444/role/api/v1.0.0/delete
@@ -128,6 +128,6 @@ public class RoleApiImpl implements IRoleApi<RoleDto> {
     public ResponseEntity<?> roleServiceDeleteById(@PathVariable(name="id",required = false) Long id) {
         RoleDto roleDto=(RoleDto)iRoleService.roleServiceDeleteById(id);
         log.info("Role Api Silindi");
-        return ResponseEntity.ok(iRoleService.roleServiceDeleteById(id));
-    }
+        return ResponseEntity.ok(roleDto);
+    }//end roleServiceDeleteById
 }// end RoleApiImpl

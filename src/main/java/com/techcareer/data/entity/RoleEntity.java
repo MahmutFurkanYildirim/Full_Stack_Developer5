@@ -21,7 +21,7 @@ import java.util.Date;
 //ENTITY
 @Entity(name = "Roles")
 @Table(name="roles")
-public class RoleEntity  implements Serializable {
+    public class RoleEntity  implements Serializable {
 
     public static final Long serialVersionUID = 1L;
 
